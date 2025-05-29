@@ -1,4 +1,4 @@
-# Script version: 2025-05-29 11:00
+# Script version: 2025-05-29 11:20
 # Script author: Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -12,6 +12,10 @@ $scriptStartTime = Get-Date
 $applicationName = "7-Zip"
 $wingetAppID = "7zip.7zip"
 
+# ---------------------------[ Log name ]---------------------------
+
+$logFileName = "uninstall.log"
+
 # ---------------------------[ Logging Setup ]---------------------------
 
 # Logging control switches
@@ -19,8 +23,8 @@ $log = $true                     # Set to $false to disable logging in shell
 $enableLogFile = $true           # Set to $false to disable file output
 
 # Define the log output location
-$logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\$applicationName"
-$logFile = "$logFileDirectory\uninstall.log"
+$logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\Application\$applicationName"
+$logFile = "$logFileDirectory\$logFileName"
 
 # Ensure the log directory exists
 if ($enableLogFile -and -not (Test-Path $logFileDirectory)) {
