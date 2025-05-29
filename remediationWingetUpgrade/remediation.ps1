@@ -1,9 +1,16 @@
-# Script version: 2025-05-03 11:45
+# Script version: 2025-05-29 11:11
+# Script author: Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
 
 # Capture start time to log script duration
 $scriptStartTime = Get-Date
+
+# ---------------------------[ Script name ]---------------------------
+
+# Script name used for folder/log naming
+$scriptName = "Winget - App Update"
+$logFileName = "remediation.log"
 
 # ---------------------------[ Winget App IDs ]---------------------------
 
@@ -21,29 +28,26 @@ $wingetApps = @(
 # ---------------------------[ Logging Setup ]---------------------------
 
 # Logging control switches
-$log = 1                         # 1 = Enable logging, 0 = Disable logging
-$EnableLogFile = $true           # Set to $false to disable file output
-
-# Script name used for folder/log naming
-$scriptName = "Winget - App Update"
+$log = $true                     # Set to $false to disable logging in shell
+$enableLogFile = $true           # Set to $false to disable file output
 
 # Define the log output location
-$LogFileDirectory = "$env:ProgramData\IntuneLogs\Scripts\$($scriptName)"
-$LogFile = "$LogFileDirectory\remediation.log"
+$logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\Scripts\$scriptName"
+$logFile = "$logFileDirectory\$logFileName"
 
 # Ensure the log directory exists
-if (-not (Test-Path $LogFileDirectory)) {
-    New-Item -ItemType Directory -Path $LogFileDirectory -Force | Out-Null
+if ($enableLogFile -and -not (Test-Path $logFileDirectory)) {
+    New-Item -ItemType Directory -Path $logFileDirectory -Force | Out-Null
 }
 
 # Function to write structured logs to file and console
 function Write-Log {
     param ([string]$Message, [string]$Tag = "Info")
 
-    if ($log -ne 1) { return } # Exit if logging is disabled
+    if (-not $log) { return } # Exit if logging is disabled
 
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $tagList = @("Start", "Check", "Info", "Success", "Error", "End")
+    $tagList = @("Start", "Check", "Info", "Success", "Error", "Debug", "End")
     $rawTag = $Tag.Trim()
 
     if ($tagList -contains $rawTag) {
@@ -59,6 +63,7 @@ function Write-Log {
         "Info"    { "Yellow" }
         "Success" { "Green" }
         "Error"   { "Red" }
+        "Debug"   { "DarkYellow"}
         "End"     { "Cyan" }
         default   { "White" }
     }
@@ -66,8 +71,8 @@ function Write-Log {
     $logMessage = "$timestamp [  $rawTag ] $Message"
 
     # Write to file if enabled
-    if ($EnableLogFile) {
-        "$logMessage" | Out-File -FilePath $LogFile -Append
+    if ($enableLogFile) {
+        "$logMessage" | Out-File -FilePath $logFile -Append
     }
 
     # Write to console with color formatting
@@ -86,13 +91,13 @@ function Complete-Script {
     $duration = $scriptEndTime - $scriptStartTime
     Write-Log "Script execution time: $($duration.ToString("hh\:mm\:ss\.ff"))" -Tag "Info"
     Write-Log "Exit Code: $ExitCode" -Tag "Info"
-    Write-Log "======== Remediation Script Completed ========" -Tag "End"
+    Write-Log "======== Detection Script Completed ========" -Tag "End"
     exit $ExitCode
 }
 
 # ---------------------------[ Script Start ]---------------------------
 
-Write-Log "======== Remediation Script Started ========" -Tag "Start"
+Write-Log "======== Detection Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
 
 # ---------------------------[ Winget folder Detection ]---------------------------
@@ -207,39 +212,29 @@ else {
     Write-Log "Winget is functioning correctly." -Tag "Success"
 }
 
-# ---------------------------[ Winget app update ]---------------------------
+# ---------------------------[ Winget app update check ]---------------------------
 
-$hasFailures = $false
+$updateRequired = $false
 
 foreach ($app in $wingetApps) {
-    Write-Log "Attempting to update $($app.FriendlyName)..." -Tag "Info"
+    Write-Log "Checking for updates for $($app.FriendlyName)" -Tag "Check"
     try {
-        $output = .\winget.exe upgrade -e --id $($app.ID) --silent --accept-package-agreements --accept-source-agreements 2>&1
-        $outputText = $output -join "`n"
+        $LocalInstall = .\winget.exe list -e --id $($app.ID) --accept-source-agreements --upgrade-available 2>&1
 
-        if ($LASTEXITCODE -eq 0) {
-            Write-Log "$($app.FriendlyName) update completed successfully." -Tag "Success"
+        if ($null -ne $LocalInstall -and $LocalInstall[-1].Trim() -eq "1 upgrades available.") {
+            Write-Log "Update required for $($app.FriendlyName)." -Tag "Info"
+            $updateRequired = $true
+        } else {
+            Write-Log "$($app.FriendlyName) is up to date or not installed." -Tag "Success"
         }
-        elseif ($outputText -match "No available upgrade found|No newer package versions are available") {
-            Write-Log "$($app.FriendlyName) is already up to date." -Tag "Success"
-        }
-        elseif ($outputText -match "No installed package found") {
-            Write-Log "$($app.FriendlyName) is not installed." -Tag "Info"
-        }
-        else {
-            Write-Log "$($app.FriendlyName) failed with exit code $LASTEXITCODE." -Tag "Error"
-            $hasFailures = $true
-        }
-
     } catch {
-        Write-Log "Exception while updating $($app.FriendlyName): $_" -Tag "Error"
-        $hasFailures = $true
+        Write-Log "Error checking $($app.FriendlyName): $_" -Tag "Error"
     }
 }
 
 # ---------------------------[ Script End ]---------------------------
 
-if ($hasFailures) {
+if ($updateRequired) {
     Complete-Script -ExitCode 1
 } else {
     Complete-Script -ExitCode 0
