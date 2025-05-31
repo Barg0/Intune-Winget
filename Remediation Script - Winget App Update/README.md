@@ -103,17 +103,18 @@ Example output:
 > │  └─📁 IntuneLogs
 > │     └─📁 Scripts
 > │        └─📁 Winget - App Update
-> │           ├──📜 detection.log
-> │           ├──📜 remediation.log  
+> │           ├──📄 detection.log
+> │           └──📄 remediation.log  
 > ```
-> To enable log collection via the **Collect diagnostics** feature in Intune, deploy this platform script:
+> To enable log collection from this custom directory using the **Collect diagnostics** feature in Intune, deploy the following platform script:
+>
 > [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
 
 ---
 
 ### Intune Script Settings
 
-In [Intune Admin Center](https://intune.microsoft.com):
+In the [Intune Admin Center](https://intune.microsoft.com):
 
 Navigate to:
 `Devices` -> `Windows` -> `Scripts and remediations` -> `Remediations` -> `Create`
