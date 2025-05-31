@@ -102,9 +102,7 @@ Example output:
 > │          ├── 📜 detection.log
 > │          ├── 📜 remediation.log  
 > ```
-> To retrieve logs using the `Collect diagnostics` feature in the Intune Admin Center, roll out this platform script:
-> 
-> [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
+> To retrieve logs using the `Collect diagnostics` feature in the Intune Admin Center, roll out this platform script: [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
 
 ## Intune Script Settings
 
