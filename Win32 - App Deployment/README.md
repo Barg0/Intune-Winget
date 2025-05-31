@@ -1,4 +1,4 @@
-# Win32 – App Deployment via Winget & Intune
+# Win32 – App Deployment
 
 This project provides three PowerShell scripts (`detection.ps1`, `install.ps1`, and `uninstall.ps1`) to deploy **Win32 apps using Winget** via **Microsoft Intune**.
 
