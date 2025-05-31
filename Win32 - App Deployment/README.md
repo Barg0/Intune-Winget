@@ -220,7 +220,7 @@ Uninstalls the app using Winget.
 
 > [!TIP]
 > **Log files** for all three scripts are saved at:
-> `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
+> `C:\ProgramData\IntuneLogs\Applications\$applicationName\`
 >
 > ```
 > C:  
@@ -234,4 +234,4 @@ Uninstalls the app using Winget.
 > ```
 >
 > To enable log collection via the **Collect diagnostics** feature in Intune, deploy this platform script:
-> 👉 [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
+> [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
