@@ -96,7 +96,7 @@ Example output:
 ---
 
 > [!TIP]
-> **Log files** for both scripts are saved at: `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
+> The **📄 Log files** for both scripts are saved at: `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
 > ```
 > C:  
 > ├─ 📁 ProgramData
