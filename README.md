@@ -2,9 +2,6 @@
 
 This repository combines two script-based approaches for managing applications with **Winget** in **Microsoft Intune**:
 
-1. **Win32 - App Deployment** – Deploy individual applications using `Win32 Apps`.
-2. **Remediation Script - Winget App Update** – Automatically update a list of applications.
-
 ---
 
 ## 🚀 How It Works
