@@ -13,7 +13,7 @@ This repository combines two script-based approaches for managing applications w
 
 ## 🙏 Credits
 
-Special thanks to the following people and sources of inspiration:
+Special thanks to the following people:
 
 * [Intune & Vita Doctrina (@IntuneVitaDoctrina)](https://www.youtube.com/@IntuneVitaDoctrina) – For the base scripts
 
