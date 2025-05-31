@@ -1,4 +1,4 @@
-### Remediation Script - Winget App Update
+## Remediation Script - Winget App Update
 
 This remediation script updates all applications defined in the `$wingetApps` array. Both `detection.ps1` and `remediation.ps1` use the same structure for this variable.
 
