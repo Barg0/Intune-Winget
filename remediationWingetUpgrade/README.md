@@ -92,7 +92,7 @@ Example output:
 
 ```
 > [!TIP]
-> Logs for these scripts are stored at: `C:\Program Data\IntuneLogs\Scripts\Winget - App Update\`
+> Logs for these scripts are stored at: `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
 > ```
 > C:  
 > ├─ 📁 ProgramData
