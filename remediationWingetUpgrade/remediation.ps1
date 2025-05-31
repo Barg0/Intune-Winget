@@ -32,7 +32,7 @@ $log = $true                     # Set to $false to disable logging in shell
 $enableLogFile = $true           # Set to $false to disable file output
 
 # Define the log output location
-$logFileDirectory = "$env:ProgramData\IntuneLogs\Scripts\$scriptName"
+$logFileDirectory = "$env:ProgramData\Microsoft\IntuneManagementExtension\Logs\Scripts\$scriptName"
 $logFile = "$logFileDirectory\$logFileName"
 
 # Ensure the log directory exists
@@ -212,29 +212,39 @@ else {
     Write-Log "Winget is functioning correctly." -Tag "Success"
 }
 
-# ---------------------------[ Winget app update check ]---------------------------
+# ---------------------------[ Winget app update ]---------------------------
 
-$updateRequired = $false
+$hasFailures = $false
 
 foreach ($app in $wingetApps) {
-    Write-Log "Checking for updates for $($app.FriendlyName)" -Tag "Check"
+    Write-Log "Attempting to update $($app.FriendlyName)..." -Tag "Info"
     try {
-        $LocalInstall = .\winget.exe list -e --id $($app.ID) --accept-source-agreements --upgrade-available 2>&1
+        $output = .\winget.exe upgrade -e --id $($app.ID) --silent --accept-package-agreements --accept-source-agreements 2>&1
+        $outputText = $output -join "`n"
 
-        if ($null -ne $LocalInstall -and $LocalInstall[-1].Trim() -eq "1 upgrades available.") {
-            Write-Log "Update required for $($app.FriendlyName)." -Tag "Info"
-            $updateRequired = $true
-        } else {
-            Write-Log "$($app.FriendlyName) is up to date or not installed." -Tag "Success"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Log "$($app.FriendlyName) update completed successfully." -Tag "Success"
         }
+        elseif ($outputText -match "No available upgrade found|No newer package versions are available") {
+            Write-Log "$($app.FriendlyName) is already up to date." -Tag "Success"
+        }
+        elseif ($outputText -match "No installed package found") {
+            Write-Log "$($app.FriendlyName) is not installed." -Tag "Info"
+        }
+        else {
+            Write-Log "$($app.FriendlyName) failed with exit code $LASTEXITCODE." -Tag "Error"
+            $hasFailures = $true
+        }
+
     } catch {
-        Write-Log "Error checking $($app.FriendlyName): $_" -Tag "Error"
+        Write-Log "Exception while updating $($app.FriendlyName): $_" -Tag "Error"
+        $hasFailures = $true
     }
 }
 
 # ---------------------------[ Script End ]---------------------------
 
-if ($updateRequired) {
+if ($hasFailures) {
     Complete-Script -ExitCode 1
 } else {
     Complete-Script -ExitCode 0
