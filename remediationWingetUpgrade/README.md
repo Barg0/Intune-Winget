@@ -93,13 +93,16 @@ Example output:
 ```
 > [!TIP]
 > Logs for these scripts are stored at: `C:\Program Data\Intune\Logs\Scripts\Winget - App Update`
-> To retrieve logs using the `Collect diagnostics` feature in the Intune Admin Center, roll out this platform script: 
+
+> To retrieve logs using the `Collect diagnostics` feature in the Intune Admin Center, roll out this platform script:
+
 > [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
 
 ## Intune Script Settings
 
 In the Microsoft Intune Admin Center:
-`intune.microsoft.com` -> `Devices` -> `Windows` -> `Scripts and remediations` -> `Create`
+
+`intune.microsoft.com` -> `Devices` -> `Windows` -> `Scripts and remediations` -> `Platform scripts` -> `Create`
 
 - Run this script using the logged-on credentials:  `No`
 - Enforce script signature check:                   `No`
