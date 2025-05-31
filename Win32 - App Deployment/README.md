@@ -219,7 +219,7 @@ Uninstalls the app using Winget.
 ---
 
 > [!TIP]
-> **Log files** for all three scripts are saved at:
+> The **📄 Log files** for all three scripts are saved at:
 > `C:\ProgramData\IntuneLogs\Applications\$applicationName\`
 >
 > ```
@@ -228,10 +228,10 @@ Uninstalls the app using Winget.
 > │  └─📁 IntuneLogs
 > │     └─📁 Applications
 > │        └─📁 $applicationName
-> │           ├──📜 detection.log
-> │           ├──📜 install.log
-> │           └──📜 uninstall.log
+> │           ├─📄 detection.log
+> │           ├─📄 install.log
+> │           └─📄 uninstall.log
 > ```
+> To enable log collection from this custom directory using the **Collect diagnostics** feature in Intune, deploy the following platform script:
 >
-> To enable log collection via the **Collect diagnostics** feature in Intune, deploy this platform script:
 > [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
