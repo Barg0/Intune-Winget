@@ -91,13 +91,13 @@ function Complete-Script {
     $duration = $scriptEndTime - $scriptStartTime
     Write-Log "Script execution time: $($duration.ToString("hh\:mm\:ss\.ff"))" -Tag "Info"
     Write-Log "Exit Code: $ExitCode" -Tag "Info"
-    Write-Log "======== Detection Script Completed ========" -Tag "End"
+    Write-Log "======== Remediation Script Completed ========" -Tag "End"
     exit $ExitCode
 }
 
 # ---------------------------[ Script Start ]---------------------------
 
-Write-Log "======== Detection Script Started ========" -Tag "Start"
+Write-Log "======== Remediation Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
 
 # ---------------------------[ Winget folder Detection ]---------------------------
