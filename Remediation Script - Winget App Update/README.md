@@ -103,8 +103,8 @@ Example output:
 > │  └─📁 IntuneLogs
 > │     └─📁 Scripts
 > │        └─📁 Winget - App Update
-> │           ├──📄 detection.log
-> │           └──📄 remediation.log  
+> │           ├─📄 detection.log
+> │           └─📄 remediation.log  
 > ```
 > To enable log collection from this custom directory using the **Collect diagnostics** feature in Intune, deploy the following platform script:
 >
