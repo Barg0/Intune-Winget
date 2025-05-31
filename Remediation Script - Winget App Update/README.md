@@ -2,7 +2,7 @@
 
 This remediation script updates all applications defined in the `$wingetApps` array. Both `detection.ps1` and `remediation.ps1` use the same structure for this variable.
 
-```
+```PowerShell
 $wingetApps = @(
     @{ ID = "7zip.7zip"; FriendlyName = "7-Zip" },
     @{ ID = "Microsoft.VCRedist.2015+.x64"; FriendlyName = "Microsoft Visual C++ 2015-2022 Redistributable (x64)" },
@@ -14,12 +14,12 @@ $wingetApps = @(
 ```
 
 To find the Winget ID for an app, open PowerShell and run:
-```
-winget search %AppName%
+```PowerShell
+winget search "AppName"
 ```
 
 Example output:
-```
+```PowerShell
 PS C:\> winget search "7-Zip"
 Name              Id                  Version            Match              Source
 ----------------------------------------------------------------------------------
@@ -31,7 +31,9 @@ Name              Id                  Version            Match              Sour
 
 Copy the `Id` value into the `ID` field in the script, and the `Name` into the `FriendlyName` field.
 
-## Detection Script
+---
+
+### Detection Script
 
 The detection script checks each defined application and exits with code `1` if __any__ update is available.
 
@@ -61,7 +63,7 @@ Example output:
 2025-05-31 09:19:12 [  End     ] ======== Detection Script Completed ========
 
 ```
-## Remediation Script
+### Remediation Script
 
 If the detection script returns `1`, the remediation script will run and attempt to update the apps.
 
@@ -91,24 +93,30 @@ Example output:
 2025-05-31 09:28:46 [  End     ] ======== Remediation Script Completed ========
 
 ```
+---
+
 > [!TIP]
-> Logs for these scripts are stored at: `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
+> **Log files** for both scripts are saved at: `C:\ProgramData\IntuneLogs\Scripts\Winget - App Update\`
 > ```
 > C:  
 > ├─ 📁 ProgramData
 > │  └─📁 IntuneLogs
 > │     └─📁 Scripts
-> │       └─📁 Winget - App Update
-> │          ├── 📜 detection.log
-> │          ├── 📜 remediation.log  
+> │        └─📁 Winget - App Update
+> │           ├──📜 detection.log
+> │           ├──📜 remediation.log  
 > ```
-> To retrieve logs using the `Collect diagnostics` feature in the Intune Admin Center, roll out this platform script: [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
+> To enable log collection via the **Collect diagnostics** feature in Intune, deploy this platform script:
+> [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
 
-## Intune Script Settings
+---
 
-In the Microsoft Intune Admin Center:
+### Intune Script Settings
 
-`intune.microsoft.com` -> `Devices` -> `Windows` -> `Scripts and remediations` -> `Remediations` -> `Create`
+In [Intune Admin Center](https://intune.microsoft.com):
+
+Navigate to:
+`Devices` -> `Windows` -> `Scripts and remediations` -> `Remediations` -> `Create`
 
 - Run this script using the logged-on credentials:  `No`
 - Enforce script signature check:                   `No`
