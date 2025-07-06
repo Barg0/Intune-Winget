@@ -16,7 +16,7 @@ $logFileName = "remediation.log"
 
 # List of applications to uninstall
 $wingetApps = @(
-    @{ ID = "OBS Studio"; FriendlyName = "OBSProject.OBSStudio" },
+    @{ ID = "OBSProject.OBSStudio"; FriendlyName = "OBS Studio" },
     @{ ID = "uvncbvba.UltraVNC"; FriendlyName = "UltraVNC" },
     @{ ID = "Microsoft.RemoteDesktopClient"; FriendlyName = "Remote Desktop" },
     @{ ID = "TeamViewer.TeamViewer.Host"; FriendlyName = "TeamViewer Host" }
