@@ -14,9 +14,8 @@ $logFileName = "detection.log"
 
 # ---------------------------[ Winget App IDs ]---------------------------
 
+# List of applications to uninstall
 $wingetApps = @(
-    @{ ID = "Mozilla.Firefox"; FriendlyName = "Mozilla Firefox" },
-    @{ ID = "VideoLAN.VLC"; FriendlyName = "VLC media player" },
     @{ ID = "OBS Studio"; FriendlyName = "OBSProject.OBSStudio" },
     @{ ID = "uvncbvba.UltraVNC"; FriendlyName = "UltraVNC" },
     @{ ID = "Microsoft.RemoteDesktopClient"; FriendlyName = "Remote Desktop" },

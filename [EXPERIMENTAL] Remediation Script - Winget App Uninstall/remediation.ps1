@@ -14,9 +14,8 @@ $logFileName = "remediation.log"
 
 # ---------------------------[ Winget App IDs ]---------------------------
 
+# List of applications to uninstall
 $wingetApps = @(
-    @{ ID = "Mozilla.Firefox"; FriendlyName = "Mozilla Firefox" },
-    @{ ID = "VideoLAN.VLC"; FriendlyName = "VLC media player" },
     @{ ID = "OBS Studio"; FriendlyName = "OBSProject.OBSStudio" },
     @{ ID = "uvncbvba.UltraVNC"; FriendlyName = "UltraVNC" },
     @{ ID = "Microsoft.RemoteDesktopClient"; FriendlyName = "Remote Desktop" },
@@ -93,13 +92,13 @@ function Complete-Script {
     $duration = $scriptEndTime - $scriptStartTime
     Write-Log "Script execution time: $($duration.ToString("hh\:mm\:ss\.ff"))" -Tag "Info"
     Write-Log "Exit Code: $ExitCode" -Tag "Info"
-    Write-Log "======== Detection Script Completed ========" -Tag "End"
+    Write-Log "======== Remediation Script Completed ========" -Tag "End"
     exit $ExitCode
 }
 
 # ---------------------------[ Script Start ]---------------------------
 
-Write-Log "======== Detection Script Started ========" -Tag "Start"
+Write-Log "======== Remediation Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
 
 # ---------------------------[ Winget folder Detection ]---------------------------
@@ -214,124 +213,65 @@ else {
     Write-Log "Winget is functioning correctly." -Tag "Success"
 }
 
-# ---------------------------[ Functions ]---------------------------
+# ---------------------------[ Detection Function ]---------------------------
 
 function Test-WingetAppInstalled {
-    param([string]$AppID, [string]$AppName)
+    param (
+        [string]$AppID,
+        [string]$AppName
+    )
+
+    # Run Winget list to check if app is installed
     $output = & .\winget.exe list -e --id $AppID --accept-source-agreements
     $exitCode = $LASTEXITCODE
+
+    # Exit code -1978335212 means no installed package found
     if ($exitCode -eq -1978335212 -and $output -match 'No installed package') {
         Write-Log "$AppName is NOT installed." -Tag "Success"
         return $false
     }
     elseif ($exitCode -ne 0) {
-        Write-Log "Winget failed while checking $AppName (code: $exitCode)" -Tag "Error"
+        # Unexpected Winget error - assume installed to be safe
+        Write-Log "Winget failed while checking $AppName (code: $exitCode)." -Tag "Error"
         return $true
-    } else {
+    }
+    else {
         Write-Log "$AppName IS installed." -Tag "Info"
         return $true
     }
 }
 
-function Get-WingetAppDisplayName {
-    param([string]$AppID)
+# ---------------------------[ Uninstall Logic ]---------------------------
 
-    try {
-        $output = & .\winget.exe list --accept-source-agreements
-        if ($LASTEXITCODE -eq 0) {
-            # Find the line that contains the exact AppID
-            $targetLine = $output | Where-Object { $_ -match "\b$AppID\b" } | Select-Object -First 1
-            if ($targetLine) {
-                # Split the line by 2 or more spaces (winget uses 2+ for column separation)
-                $columns = $targetLine -split '\s{2,}'
-                # Find index of ID column
-                $idIndex = $columns.IndexOf($AppID)
-                if ($idIndex -gt 0) {
-                    # DisplayName is everything before AppID
-                    $displayName = $columns[$idIndex - 1].Trim()
-                    Write-Log "Parsed DisplayName from Winget list: $displayName" -Tag "Info"
-                    return $displayName
-                } else {
-                    Write-Log "Could not determine DisplayName position in: $targetLine" -Tag "Error"
-                }
-            } else {
-                Write-Log "No matching entry found in Winget list for AppID: $AppID" -Tag "Error"
-            }
-        } else {
-            Write-Log "Winget list failed for AppID: $AppID with exit code $LASTEXITCODE" -Tag "Error"
-        }
-    } catch {
-        Write-Log "Exception in Get-WingetAppDisplayName for $($AppID): $_" -Tag "Error"
-    }
-
-    return $null
-}
-
-
-function Test-RegistryUninstall {
-    param (
-        [string]$DisplayName,
-        [string]$AppName
-    )
-    $registryPaths = @(
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
-    )
-    foreach ($regPath in $registryPaths) {
-        try {
-            $subKeys = Get-ChildItem -Path $regPath -ErrorAction SilentlyContinue
-            foreach ($subKey in $subKeys) {
-                $props = Get-ItemProperty -Path $subKey.PSPath -ErrorAction SilentlyContinue
-                if ($props.DisplayName -and $props.DisplayName -eq $DisplayName) {
-                    $uninstallString = $props.UninstallString
-                    if ($uninstallString) {
-                        Write-Log "Found uninstall string in registry for $($AppName): $uninstallString" -Tag "Info"
-                        if ($uninstallString -notmatch "/silent") {
-                            $uninstallString += " /silent"
-                        }
-                        try {
-                            Write-Log "Executing fallback uninstall for $AppName via registry..." -Tag "Check"
-                            Start-Process -FilePath "cmd.exe" -ArgumentList "/c `"$uninstallString`"" -Wait -NoNewWindow
-                            Start-Sleep -Seconds 5
-                            return $true
-                        } catch {
-                            Write-Log "Failed to run uninstall string: $_" -Tag "Error"
-                        }
-                    }
-                }
-            }
-        } catch {
-            Write-Log "Error reading registry path $($regPath): $_" -Tag "Error"
-        }
-    }
-    Write-Log "No matching registry uninstall entry found for $AppName" -Tag "Error"
-    return $false
-}
-
-# ---------------------------[ Main Loop ]---------------------------
-
+# Will be set to false if any app fails to uninstall
 $allUninstallsSuccessful = $true
 
 foreach ($app in $wingetApps) {
     $appName = $app.FriendlyName
     $appID = $app.ID
 
+    # Skip if already uninstalled
     if (-not (Test-WingetAppInstalled -AppID $appID -AppName $appName)) {
         Write-Log "$appName is already uninstalled. Skipping." -Tag "Info"
         continue
     }
 
-    Write-Log "Attempting to uninstall $appName (1st attempt)..." -Tag "Check"
+    Write-Log "Attempting to uninstall $appName..." -Tag "Check"
+
     try {
+        # Attempt uninstall
         .\winget.exe uninstall -e --id $appID --silent --force --accept-source-agreements
         Start-Sleep -Seconds 5
     } catch {
         Write-Log "Initial uninstall failed for $($appName): $_" -Tag "Error"
     }
 
+    # Check if uninstall succeeded
     if (Test-WingetAppInstalled -AppID $appID -AppName $appName) {
-        Write-Log "Still installed. Retrying uninstall for $appName..." -Tag "Check"
+        Write-Log "$appName still detected. Retrying uninstall..." -Tag "Check"
+
         try {
+            # Retry once
             .\winget.exe uninstall -e --id $appID --silent --force --accept-source-agreements
             Start-Sleep -Seconds 5
         } catch {
@@ -339,29 +279,18 @@ foreach ($app in $wingetApps) {
         }
     }
 
-    # Final check after Winget attempts
+    # Final verification
     if (Test-WingetAppInstalled -AppID $appID -AppName $appName) {
-        Write-Log "Winget uninstall failed twice. Trying registry fallback..." -Tag "Check"
-        $displayName = Get-WingetAppDisplayName -AppID $appID
-        if ($null -ne $displayName) {
-            Test-RegistryUninstall -DisplayName $displayName -AppName $appName | Out-Null
-            if (Test-WingetAppInstalled -AppID $appID -AppName $appName) {
-                Write-Log "Final check: $appName still installed after registry uninstall." -Tag "Error"
-                $allUninstallsSuccessful = $false
-            } else {
-                Write-Log "$appName removed via registry fallback." -Tag "Success"
-            }
-        } else {
-            Write-Log "Could not determine DisplayName from Winget list for $appName." -Tag "Error"
-            $allUninstallsSuccessful = $false
-        }
+        Write-Log "Final check: $appName was NOT removed." -Tag "Error"
+        $allUninstallsSuccessful = $false
     } else {
-        Write-Log "$appName successfully removed by Winget." -Tag "Success"
+        Write-Log "$appName uninstalled successfully." -Tag "Success"
     }
 }
 
-# ---------------------------[ Complete Script ]---------------------------
+# ---------------------------[ Completion ]---------------------------
 
+# Exit with 1 if any uninstalls failed (to flag failure in Intune)
 if ($allUninstallsSuccessful) {
     Complete-Script -ExitCode 0
 } else {
