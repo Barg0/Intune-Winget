@@ -1,6 +1,3 @@
-# Script version: 2025-05-29 11:11
-# Script author: Barg0
-
 # ---------------------------[ Script Start Timestamp ]---------------------------
 
 # Capture start time to log script duration
@@ -15,14 +12,62 @@ $logFileName = "detection.log"
 # ---------------------------[ Winget App IDs ]---------------------------
 
 $wingetApps = @(
-    @{ ID = "7zip.7zip"; FriendlyName = "7-Zip" },
-    @{ ID = "Microsoft.VCRedist.2015+.x64"; FriendlyName = "Microsoft Visual C++ 2015-2022 Redistributable (x64)" },
+    @{ ID = "Microsoft.VCRedist.2005.x86"; FriendlyName = "Microsoft Visual C++ 2005 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2005.x64"; FriendlyName = "Microsoft Visual C++ 2005 Redistributable (x64)" },
+    @{ ID = "Microsoft.VCRedist.2008.x86"; FriendlyName = "Microsoft Visual C++ 2008 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2008.x64"; FriendlyName = "Microsoft Visual C++ 2008 Redistributable (x64)" },
+    @{ ID = "Microsoft.VCRedist.2010.x86"; FriendlyName = "Microsoft Visual C++ 2010 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2010.x64"; FriendlyName = "Microsoft Visual C++ 2010 Redistributable (x64)" },
+    @{ ID = "Microsoft.VCRedist.2012.x86"; FriendlyName = "Microsoft Visual C++ 2012 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2012.x64"; FriendlyName = "Microsoft Visual C++ 2012 Redistributable (x64)" },
+    @{ ID = "Microsoft.VCRedist.2013.x86"; FriendlyName = "Microsoft Visual C++ 2013 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2013.x64"; FriendlyName = "Microsoft Visual C++ 2013 Redistributable (x64)" },
     @{ ID = "Microsoft.VCRedist.2015+.x86"; FriendlyName = "Microsoft Visual C++ 2015-2022 Redistributable (x86)" },
+    @{ ID = "Microsoft.VCRedist.2015+.x64"; FriendlyName = "Microsoft Visual C++ 2015-2022 Redistributable (x64)" },
+    @{ ID = "Microsoft.DotNet.DesktopRuntime.3_1"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 3.1" },
+    @{ ID = "Microsoft.DotNet.DesktopRuntime.5"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 5.0" },
+    @{ ID = "Microsoft.DotNet.DesktopRuntime.6"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 6.0" },
+    @{ ID = "Microsoft.DotNet.DesktopRuntime.7"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 7.0" },
     @{ ID = "Microsoft.DotNet.DesktopRuntime.8"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 8.0" },
-    @{ ID = "Microsoft.DotNet.AspNetCore.8"; FriendlyName = "Microsoft ASP.NET Core Runtime 8.0" }
-#   @{ ID = "Google.Chrome"; FriendlyName = "Google Chrome" }
-#   @{ ID = "Google.Chrome.EXE"; FriendlyName = "Google Chrome (EXE)" }
-#   @{ ID = "AGFEO.AGFEODashboard"; FriendlyName = "AGFEO Dashboard" }
+    @{ ID = "Microsoft.DotNet.DesktopRuntime.9"; FriendlyName = "Microsoft .NET Windows Desktop Runtime 9.0" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.3_1"; FriendlyName = "Microsoft ASP.NET Core Runtime 3.1" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.5"; FriendlyName = "Microsoft ASP.NET Core Runtime 5.0" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.6"; FriendlyName = "Microsoft ASP.NET Core Runtime 6.0" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.7"; FriendlyName = "Microsoft ASP.NET Core Runtime 7.0" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.8"; FriendlyName = "Microsoft ASP.NET Core Runtime 8.0" },
+    @{ ID = "Microsoft.DotNet.AspNetCore.9"; FriendlyName = "Microsoft ASP.NET Core Runtime 9.0" },
+    @{ ID = "Microsoft.DotNet.HostingBundle.3_1"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 3.1" },
+    @{ ID = "Microsoft.DotNet.HostingBundle.5"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 5.0" },
+    @{ ID = "Microsoft.DotNet.HostingBundle.6"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 6.0" },
+    @{ ID = "Microsoft.DotNet.HostingBundle.7"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 7.0 " },
+    @{ ID = "Microsoft.DotNet.HostingBundle.8"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 8.0" },
+    @{ ID = "Microsoft.DotNet.HostingBundle.9"; FriendlyName = "Microsoft ASP.NET Core Hosting Bundle 9.0" },
+    @{ ID = "Microsoft.DotNet.Runtime.3_1"; FriendlyName = "Microsoft .NET Runtime 3.1" },
+    @{ ID = "Microsoft.DotNet.Runtime.5"; FriendlyName = "Microsoft .NET Runtime 5.0" },
+    @{ ID = "Microsoft.DotNet.Runtime.6"; FriendlyName = "Microsoft .NET Runtime 6.0" },
+    @{ ID = "Microsoft.DotNet.Runtime.7"; FriendlyName = "Microsoft .NET Runtime 7.0" },
+    @{ ID = "Microsoft.DotNet.Runtime.8"; FriendlyName = "Microsoft .NET Runtime 8.0" },
+    @{ ID = "Microsoft.DotNet.Runtime.9"; FriendlyName = "Microsoft .NET Runtime 9.0" },
+    @{ ID = "Microsoft.msodbcsql.11"; FriendlyName = "Microsoft ODBC Driver 11 for SQL Server" },
+    @{ ID = "Microsoft.msodbcsql.13"; FriendlyName = "Microsoft ODBC Driver 13 for SQL Server" },
+    @{ ID = "Microsoft.msodbcsql.17"; FriendlyName = "Microsoft ODBC Driver 17 for SQL Server" },
+    @{ ID = "Microsoft.msodbcsql.18"; FriendlyName = "Microsoft ODBC Driver 18 for SQL Server" },
+    @{ ID = "Microsoft.VSTOR"; FriendlyName = "Visual Studio 2010 Tools for Office Runtime" },
+    @{ ID = "7zip.7zip"; FriendlyName = "7-Zip" },
+    @{ ID = "Google.Chrome"; FriendlyName = "Google Chrome" },
+    @{ ID = "Google.Chrome.EXE"; FriendlyName = "Google Chrome" },
+    @{ ID = "3Dconnexion.3DxWare.10"; FriendlyName = "3Dconnexion 3DxWare 10" },
+    @{ ID = "JGraph.Draw"; FriendlyName = "draw.io" },
+    @{ ID = "DYMO.DYMOConnect"; FriendlyName = "DYMO Connect" },
+    @{ ID = "SolidWorks.eDrawings"; FriendlyName = "eDrawings" },
+    @{ ID = "LuxTrust.LuxTrustMiddleware"; FriendlyName = "LuxTrust Middleware" },
+    @{ ID = "uvncbvba.UltraVNC"; FriendlyName = "UltraVNC" },
+    @{ ID = "Notepad++.Notepad++"; FriendlyName = "Notepad++" },
+    @{ ID = "uvncbvba.UltraVNC"; FriendlyName = "eDrawings" },
+    @{ ID = "Unity.UnityHub"; FriendlyName = "Unity Hub" },
+    @{ ID = "Microsoft.VisualStudio.2022.Professional"; FriendlyName = "Visual Studio Professional 2022" },
+    @{ ID = "Yubico.YubiKeySmartCardMinidriver"; FriendlyName = "YubiKey Smart Card Minidriver" }
+#   @{ ID = "TEMP"; FriendlyName = "TEMP" }
 )
 
 # ---------------------------[ Logging Setup ]---------------------------
@@ -95,137 +140,171 @@ function Complete-Script {
     exit $ExitCode
 }
 
+# ---------------------------[ Winget Path Resolver ]---------------------------
+function Get-WingetPath {
+    $wingetBase = "$env:ProgramW6432\WindowsApps"
+    try {
+        $wingetFolders = Get-ChildItem -Path $wingetBase -Directory |
+            Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe' }
+
+        # Write-Log "Winget folder count: $($wingetFolders.Count)" -Tag "Info"
+        if (-not $wingetFolders) {
+            throw "No matching Winget installation folders found."
+        }
+
+        $latestWingetFolder = $wingetFolders |
+            Sort-Object CreationTime -Descending |
+            Select-Object -First 1
+
+        $wingetPath = Join-Path $latestWingetFolder.FullName 'winget.exe'
+
+        # Write-Log "Winget exe path: $wingetPath" -Tag "Info"
+        if (-not (Test-Path $wingetPath)) {
+            throw "winget.exe not found at expected location."
+        }
+
+        return $wingetPath
+    } catch {
+        Write-Log "Failed to detect Winget installation: $_" -Tag "Error"
+        Complete-Script -ExitCode 1
+    }
+}
+
+# ---------------------------[ Winget Repair Function ]---------------------------
+
+function Invoke-WingetRepair {
+    Write-Log "Starting Winget repair..." -Tag "Info"
+
+    Register-WingetDependencyPaths
+
+    Write-Log "Restart required..." -Tag "Info"
+    Complete-Script -ExitCode 0
+}
+
+function Register-WingetDependencyPaths {
+    Write-Log "Registering Winget dependency DLL directories into SYSTEM PATH..." -Tag "Info"
+    try {
+        $windowsApps = "$env:ProgramW6432\WindowsApps"
+        if (-not (Test-Path $windowsApps)) {
+            Write-Log "WindowsApps folder not found: $windowsApps" -Tag "Error"
+            return
+        }
+
+        $dllPackages = @(
+            'Microsoft.VCLibs.140.00.UWPDesktop',
+            'Microsoft.UI.Xaml.2.8'
+        )
+
+        $pathsToAdd = @()
+
+        foreach ($pkg in $dllPackages) {
+            $folder = Get-ChildItem -Path $windowsApps -Directory |
+                Where-Object { $_.Name -like "$pkg*_x64__*" } |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1
+
+            if ($folder) {
+                Write-Log "Found $pkg at: $($folder.FullName)" -Tag "Info"
+                $pathsToAdd += $folder.FullName
+            } else {
+                Write-Log "Could not find folder for $pkg" -Tag "Error"
+            }
+        }
+
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+        $updated = $false
+        foreach ($path in $pathsToAdd | Select-Object -Unique) {
+            if ($currentPath -notlike "*$path*") {
+                Write-Log "Adding path to SYSTEM PATH: $path" -Tag "Info"
+                $currentPath += ";$path"
+                $updated = $true
+            } else {
+                Write-Log "Path already present: $path" -Tag "Debug"
+            }
+        }
+
+        if ($updated) {
+            [Environment]::SetEnvironmentVariable("Path", $currentPath, "Machine")
+            Write-Log "SYSTEM PATH updated with dependency directories." -Tag "Success"
+        } else {
+            Write-Log "No changes made to SYSTEM PATH." -Tag "Info"
+        }
+    } catch {
+        Write-Log "Failed to update SYSTEM PATH: $_" -Tag "Error"
+    }
+}
+
+function Test-NuGetProvider {
+    [CmdletBinding()]
+    param ([version]$MinimumVersion = [version]'2.8.5.201')
+    $provider = Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue |
+        Sort-Object Version -Descending |
+        Select-Object -First 1
+
+    if (-not $provider) {
+        Write-Log 'NuGet Provider Package not detected, installing...' -Tag "Info"
+        Install-PackageProvider -Name NuGet -Force | Out-Null
+    } elseif ($provider.Version -lt $MinimumVersion) {
+        Write-Log "NuGet provider v$($provider.Version) is less than required v$MinimumVersion; updating." -Tag "Info"
+        Install-PackageProvider -Name NuGet -Force | Out-Null
+    } else {
+        Write-Log "NuGet provider meets min requirements (v:$($provider.Version))." -Tag "Success"
+    }
+}
+
+function Test-Winget {
+    # Write-Log "Checking Winget version" -Tag "Debug"
+    $wingetPath = Get-WingetPath
+    $output = & $wingetPath -v
+    $exitCode = $LASTEXITCODE
+
+    if ($null -ne $output -and $exitCode -eq 0) {
+        Write-Log "Winget version: $output" -Tag "Info"
+    } else {
+        Write-Log "Winget execution failed with exit code: $exitCode" -Tag "Error"
+        Write-Log "Winget output: $output" -Tag "Debug"
+    }
+
+    return $exitCode -eq 0
+}
+
 # ---------------------------[ Script Start ]---------------------------
 
 Write-Log "======== Detection Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
 
-# ---------------------------[ Winget folder Detection ]---------------------------
-
-# Change to the correct path so winget.exe can run in SYSTEM context
-$wingetBase = "$env:ProgramW6432\WindowsApps"
-
-try {
-    # Find all matching x64 Winget folders
-    $wingetFolders = Get-ChildItem -Path $wingetBase -Directory |
-        Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe' }
-        Write-Log "Winget folder count: $($wingetFolders.Count)" -Tag "Info"
-    if ($null -eq $wingetFolders -or $wingetFolders.Count -eq 0) {
-        throw "No matching Winget installation folders found."
-    }
-
-    # Sort by CreationTime (latest first)
-    $latestWingetFolder = $wingetFolders |
-        Sort-Object CreationTime -Descending |
-        Select-Object -First 1
-
-    # Log selected folder path and creation date
-    Write-Log "Winget folder path: $($latestWingetFolder.FullName)" -Tag "Info"
-    Write-Log "Winget folder creation date: $($latestWingetFolder.CreationTime.ToString('yyyy-MM-dd HH:mm:ss'))" -Tag "Info"
-
-    # Change to the most recent folder
-    Set-Location -Path $latestWingetFolder.FullName
-    Write-Log "Navigated to Winget directory successfully." -Tag "Success"
-
-} catch {
-    Write-Log "Failed to access Winget directory. Exception: $_" -Tag "Error"
-    Complete-Script -ExitCode 1
-}
-
-# ---------------------------[ Winget repair functions ]---------------------------
-
-function Test-NuGetProvider {
-	[CmdletBinding()]
-	param (
-		[version]$MinimumVersion = [version]'2.8.5.201'
-	)
-	$provider = Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue |
-	Sort-Object Version -Descending |
-	Select-Object -First 1
-
-	if (-not $provider) {
-		Write-Log 'NuGet Provider Package not detected, installing...' -Tag "Info"
-		Install-PackageProvider -Name NuGet -Force | Out-Null
-	} elseif ($provider.Version -lt $MinimumVersion) {
-		Write-Log "NuGet provider v$($provider.Version) is less than required v$MinimumVersion; updating." -Tag "Info"
-		Install-PackageProvider -Name NuGet -Force | Out-Null
-        
-	} else {
-		Write-Log "NuGet provider meets min requirements (v:$($provider.Version))." -Tag "Success"
-	}
-    
-}
-
-function Test-Winget {
-    Write-Log "Checking Winget version" -Tag "Check"
-    $wingetVersionOutput = & .\winget.exe -v
-    $wingetVersionExitCode = $LASTEXITCODE
-
-    if ($null -ne $wingetVersionOutput -and $wingetVersionExitCode -eq 0) {
-        Write-Log "Winget version: $wingetVersionOutput" -Tag "Info"
-    }
-    elseif ($wingetVersionExitCode -ne 0) {
-        Write-Log "Winget execution failed with exit code: $wingetVersionExitCode" -Tag "Error"
-        Write-Log "Winget output: $wingetVersionOutput" -Tag "Debug"
-    }
-
-    return $wingetVersionExitCode -eq 0
-}
-
-function Invoke-WingetRepair {
-    Write-Log "Attempting Winget repair..." -Tag "Info"
-
-    try {
-        Write-Log "Installing Microsoft.WinGet.Client from PSGallery..." -Tag "Info"
-        Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery -Scope AllUsers -ErrorAction Stop | Out-Null
-        Write-Log "Module installed successfully." -Tag "Success"
-
-        Write-Log "Running Repair-WinGetPackageManager..." -Tag "Info"
-        Repair-WinGetPackageManager -AllUsers -Force -Latest -ErrorAction Stop | Out-Null
-        Write-Log "Repair completed successfully." -Tag "Success"
-    }
-    catch {
-        Write-Log "Exception during Winget repair attempt: $_" -Tag "Error"
-    }
-}
-
 # ---------------------------[ Winget version check ]---------------------------
 
-# Run initial check
 if (-not (Test-Winget)) {
     Write-Log "Winget not working correctly. Proceeding to repair." -Tag "Info"
-
     Test-NuGetProvider
     Invoke-WingetRepair
 
-    # Retry after repair
     Write-Log "Retrying Winget version check after repair..." -Tag "Info"
     if (-not (Test-Winget)) {
         Write-Log "Winget is still not working after repair. Exiting script." -Tag "Error"
         Complete-Script -ExitCode 1
-    }
-    else {
+    } else {
         Write-Log "Winget is now functioning after repair." -Tag "Success"
     }
-}
-else {
-    Write-Log "Winget is functioning correctly." -Tag "Success"
+} else {
+    # Write-Log "Winget is functioning correctly." -Tag "Debug"
 }
 
 # ---------------------------[ Winget app update check ]---------------------------
 
+$wingetPath = Get-WingetPath
 $updateRequired = $false
 
 foreach ($app in $wingetApps) {
-    Write-Log "Checking for updates for $($app.FriendlyName)" -Tag "Check"
+    # Write-Log "Checking for updates for $($app.FriendlyName)" -Tag "Debug"
     try {
-        $LocalInstall = .\winget.exe list -e --id $($app.ID) --accept-source-agreements --upgrade-available 2>&1
-
-        if ($null -ne $LocalInstall -and $LocalInstall[-1].Trim() -eq "1 upgrades available.") {
+        $result = & $wingetPath list -e --id $($app.ID) --accept-source-agreements --upgrade-available 2>&1
+        if ($null -ne $result -and $result[-1].Trim() -eq "1 upgrades available.") {
             Write-Log "Update required for $($app.FriendlyName)." -Tag "Info"
             $updateRequired = $true
         } else {
-            Write-Log "$($app.FriendlyName) is up to date or not installed." -Tag "Success"
+            # Write-Log "$($app.FriendlyName) is up to date or not installed." -Tag "Success"
         }
     } catch {
         Write-Log "Error checking $($app.FriendlyName): $_" -Tag "Error"
