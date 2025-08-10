@@ -1,4 +1,4 @@
-# Script version: 2025-05-29 11:20
+# Script version: 2025-08-10 13:45
 # Script author: Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -238,6 +238,7 @@ try {
     Write-Log "Winget install failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
 }
+
 
 
 
