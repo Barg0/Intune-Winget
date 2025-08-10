@@ -125,7 +125,7 @@ function Invoke-WingetRepair {
     Register-WingetDependencyPaths
 
     Write-Log "Restart required..." -Tag "Info"
-    Complete-Script -ExitCode 1
+    Complete-Script -ExitCode 0
 }
 
 function Register-WingetDependencyPaths {
@@ -181,24 +181,6 @@ function Register-WingetDependencyPaths {
     }
 }
 
-function Test-NuGetProvider {
-    [CmdletBinding()]
-    param ([version]$MinimumVersion = [version]'2.8.5.201')
-    $provider = Get-PackageProvider -Name NuGet -ListAvailable -ErrorAction SilentlyContinue |
-        Sort-Object Version -Descending |
-        Select-Object -First 1
-
-    if (-not $provider) {
-        Write-Log 'NuGet Provider Package not detected, installing...' -Tag "Info"
-        Install-PackageProvider -Name NuGet -Force | Out-Null
-    } elseif ($provider.Version -lt $MinimumVersion) {
-        Write-Log "NuGet provider v$($provider.Version) is less than required v$MinimumVersion; updating." -Tag "Info"
-        Install-PackageProvider -Name NuGet -Force | Out-Null
-    } else {
-        Write-Log "NuGet provider meets min requirements (v:$($provider.Version))." -Tag "Success"
-    }
-}
-
 function Test-Winget {
     # Write-Log "Checking Winget version" -Tag "Debug"
     $wingetPath = Get-WingetPath
@@ -225,7 +207,7 @@ Write-Log "Winget App ID: $wingetAppID" -Tag "Info"
 
 if (-not (Test-Winget)) {
     Write-Log "Winget not working correctly. Proceeding to repair." -Tag "Info"
-    Test-NuGetProvider
+
     Invoke-WingetRepair
 
     Write-Log "Retrying Winget version check after repair..." -Tag "Info"
@@ -258,3 +240,4 @@ try {
     Complete-Script -ExitCode 1
 
 }
+
