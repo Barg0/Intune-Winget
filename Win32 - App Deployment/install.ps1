@@ -245,7 +245,7 @@ if (-not (Test-Winget)) {
 try {
     $wingetPath = Get-WingetPath
     # Write-Log "Executing Winget install command..." -Tag "Info"
-    & $wingetPath install -e --id $wingetAppID --silent --accept-package-agreements --accept-source-agreements --force
+    & $wingetPath install -e --id $wingetAppID --silent --scope "machine" --accept-package-agreements --accept-source-agreements --force
     if ($LASTEXITCODE -eq 0) {
         Write-Log "Installation completed successfully." -Tag "Success"
         Complete-Script -ExitCode 0
@@ -257,3 +257,4 @@ try {
     Write-Log "Winget install failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
 }
+
