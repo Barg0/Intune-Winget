@@ -9,8 +9,8 @@ $scriptStartTime = Get-Date
 # ---------------------------[ Winget App ID ]---------------------------
 
 # Define the Winget App ID
-$applicationName = "7-Zip"
-$wingetAppID = "7zip.7zip"
+$applicationName = "__APPLICATION_NAME__"
+$wingetAppID     = "__WINGET_APP_ID__"
 
 # ---------------------------[ Log name ]---------------------------
 
@@ -248,3 +248,4 @@ try {
     Complete-Script -ExitCode 1
 
 }
+
