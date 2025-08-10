@@ -4,7 +4,7 @@
 $scriptStartTime = Get-Date
 
 # ---------------------------[ Script name ]---------------------------
-$scriptName   = "Winget - App Update (Blacklist)"
+$scriptName   = "Winget - App Update"
 $logFileName  = "remediation.log"
 
 # ---------------------------[ Config ]---------------------------
@@ -315,3 +315,4 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
+
