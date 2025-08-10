@@ -4,7 +4,7 @@
 $scriptStartTime = Get-Date
 
 # ---------------------------[ Script name ]---------------------------
-$scriptName   = "Winget - App Update (Blacklist)"
+$scriptName   = "Winget - App Update"
 $logFileName  = "detection.log"
 
 # ---------------------------[ Config ]---------------------------
@@ -236,3 +236,4 @@ if ($eligible.Count -gt 0) {
     Write-Log "Updates exist but none eligible after filters (Unknown/Blacklist)." -Tag "Success"
     Complete-Script -ExitCode 0
 }
+
