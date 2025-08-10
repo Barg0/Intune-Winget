@@ -245,7 +245,7 @@ if (-not (Test-Winget)) {
 try {
     $wingetPath = Get-WingetPath
     # Write-Log "Running Winget uninstall command..." -Tag "Info"
-    & $wingetPath uninstall -e --id $wingetAppID --silent --accept-source-agreements --force
+    & $wingetPath uninstall -e --id $wingetAppID --silent --scope "machine" --accept-source-agreements --force
     if ($LASTEXITCODE -eq 0) {
         Write-Log "Uninstallation completed successfully." -Tag "Success"
         Complete-Script -ExitCode 0
@@ -256,4 +256,5 @@ try {
 } catch {
     Write-Log "Uninstallation failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
+
 }
