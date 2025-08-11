@@ -1,5 +1,15 @@
 # =========================[ Winget - App Update (Blacklist) - REMEDIATION ]=========================
 
+# ---------------------------[ UTF-8 / Encoding Normalization (WAU-style) ]---------------------------
+try {
+    $null = & "$env:WINDIR\System32\cmd.exe" /c ""      # prime console like WAU
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+    $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8BOM'
+    $PSDefaultParameterValues['*:Encoding']        = 'utf8'
+    $ProgressPreference = 'SilentlyContinue'
+} catch {}
+
 # ---------------------------[ Script Start Timestamp ]---------------------------
 $scriptStartTime = Get-Date
 
@@ -14,12 +24,18 @@ $AllowReboot          = $false
 
 # Blacklist (Winget IDs; wildcards OK)
 $ExcludeIds = @(
-    'Microsoft.Edge','Microsoft.Edge.Beta','Microsoft.Edge.Dev','Microsoft.EdgeWebView2Runtime',
-    'Microsoft.Office','Microsoft.OneDrive',
-    'Microsoft.Teams','Microsoft.Teams.Classic',
+    'Microsoft.Edge*',
+    'Microsoft.Teams*',    
+    'Microsoft.Office',
+    'Microsoft.OneDrive',
     'Microsoft.RemoteDesktopClient',
     'Microsoft.VCLibs.*',
-    'BraveSoftware.BraveBrowser*'
+    'Fortinet.FortiClientVPN',
+    'Mozilla.Firefox*',
+    'Opera.Opera*',
+    'TeamViewer.TeamViewer*',
+    'Google.Chrome*',
+    'Brave.Brave*'
 )
 
 # ---------------------------[ Logging Setup (append; consistent encoding) ]---------------------------
@@ -142,56 +158,65 @@ function Test-Winget {
 }
 
 # ---------------------------[ WAU-style parsing + helpers ]---------------------------
-# [WAU-derived] parse the table from `winget upgrade --source <src>`; only drop indented chatter
 class Software { [string]$Name; [string]$Id; [string]$Version; [string]$AvailableVersion }
 
 function Get-WingetOutdatedApps {
-    param(
+    Param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$Source
     )
 
     $wg = Get-WingetPath
+
+    # Get list of available upgrades; drop indented/progress lines (WAU behavior)
     try {
-        $raw = & $wg upgrade --source $Source 2>&1
+        $raw = & $wg upgrade --source $Source | Where-Object { $_ -notlike "   *" } | Out-String
     } catch {
         Write-Log "Error while receiving winget upgrade list: $_" -Tag "Error"
-        return @()
+        $raw = $null
     }
-    if (-not $raw) { return @() }
 
-    $lines = $raw | Where-Object { $_ } | Where-Object { $_ -notmatch '^\s{3,}' }
+    # "No update found" handling like WAU
+    if (-not ($raw -match "-----")) {
+        return "No update found. 'winget upgrade' output:`n$raw"
+    }
 
-    $sepIndex = 0
-    while ($sepIndex -lt $lines.Count -and -not $lines[$sepIndex].StartsWith('-----')) { $sepIndex++ }
-    if ($sepIndex -eq 0 -or $sepIndex -ge $lines.Count) { return @() }
+    # Split to lines
+    $lines = $raw.Split([Environment]::NewLine) | Where-Object { $_ }
 
-    $headerLine = $lines[$sepIndex - 1]
-    $index = $headerLine -split '(?<=\s)(?!\s)'
+    # Find the dashed separator and header line
+    $fl = 0
+    while (-not $lines[$fl].StartsWith("-----")) { $fl++ }
+    $fl = $fl - 1
 
+    # Compute column boundaries with CJK compensation (WAU)
+    $index = $lines[$fl] -split '(?<=\s)(?!\s)'
     $idStart        = ($index[0] -replace '[\u4e00-\u9fa5]', '**').Length
-    $versionStart   = $idStart +    (($index[1] -replace '[\u4e00-\u9fa5]', '**').Length)
-    $availableStart = $versionStart +(($index[2] -replace '[\u4e00-\u9fa5]', '**').Length)
+    $versionStart   = $idStart        + (($index[1] -replace '[\u4e00-\u9fa5]', '**').Length)
+    $availableStart = $versionStart   + (($index[2] -replace '[\u4e00-\u9fa5]', '**').Length)
 
+    # Parse rows
     $upgradeList = @()
-    for ($i = $sepIndex + 1; $i -lt $lines.Count; $i++) {
-        $line = $lines[$i] -replace "[\u2026]", " "
+    for ($i = $fl + 2; $i -lt $lines.Length; $i++) {
+        $line = $lines[$i] -replace "[\u2026]", " "  # normalize ellipsis
         if ($line.StartsWith("-----")) {
-            $headerLine = $lines[$i - 1]
-            $index = $headerLine -split '(?<=\s)(?!\s)'
+            # header changed -> recompute columns
+            $fl = $i - 1
+            $index = $lines[$fl] -split '(?<=\s)(?!\s)'
             $idStart        = ($index[0] -replace '[\u4e00-\u9fa5]', '**').Length
-            $versionStart   = $idStart +    (($index[1] -replace '[\u4e00-\u9fa5]', '**').Length)
-            $availableStart = $versionStart +(($index[2] -replace '[\u4e00-\u9fa5]', '**').Length)
+            $versionStart   = $idStart        + (($index[1] -replace '[\u4e00-\u9fa5]', '**').Length)
+            $availableStart = $versionStart   + (($index[2] -replace '[\u4e00-\u9fa5]', '**').Length)
             continue
         }
+        # apps-only heuristic (WAU)
         if ($line -match "\w\.\w") {
-            $soft = [Software]::new()
             $nameDecl = (($line.Substring(0, $idStart) -replace '[\u4e00-\u9fa5]', '**').Length) - ($line.Substring(0, $idStart).Length)
+            $soft = [Software]::new()
             $soft.Name             = $line.Substring(0, $idStart - $nameDecl).TrimEnd()
             $soft.Id               = $line.Substring($idStart - $nameDecl, $versionStart - $idStart).TrimEnd()
             $soft.Version          = $line.Substring($versionStart - $nameDecl, $availableStart - $versionStart).TrimEnd()
-            $soft.AvailableVersion = $line.Substring($availableStart - $nameDecl).TrimEnd()
+            $soft.AvailableVersion = $line.Substring($availableStart - $nameDecl).TrimEnd()   # may include " winget" and that's fine
             $upgradeList += $soft
         }
     }
@@ -201,42 +226,19 @@ function Get-WingetOutdatedApps {
 
 function Test-IdInList { param([string]$Id,[string[]]$List) foreach ($pat in $List) { if ([string]::IsNullOrWhiteSpace($pat)) { continue } if ($Id -like $pat) { return $true } } return $false }
 
-# --- Confirm/reboot helpers ---
-function Get-InstalledVersion {
-    param([string]$Id, [string]$Source)
-    $wg = Get-WingetPath
-    $out = & $wg list -e --id $Id -s $Source 2>&1 | Out-String
-    if (-not ($out -match "-----")) { return $null }
-    $lines = $out -split "(`r`n|`n|`r)" | Where-Object { $_ }
-    $sep = ($lines | Select-String -Pattern '^-{3,}' -SimpleMatch).LineNumber | Select-Object -First 1
-    if (-not $sep) { return $null }
-    for ($i = $sep; $i -lt $lines.Count; $i++) {
-        $line = $lines[$i].TrimEnd()
-        if ([string]::IsNullOrWhiteSpace($line)) { continue }
-        $parts = ($line -split '\s{2,}') | Where-Object { $_ -ne '' }
-        if ($parts.Count -ge 3) {
-            if ($parts[1].Trim() -eq $Id) { return $parts[2].Trim() }
-        }
-    }
-    return $null
-}
-
+# --- Confirmation helpers ---
 function Test-StillOutdated {
     param([string]$Id, [string]$Source)
     $list = Get-WingetOutdatedApps -Source $Source
-    if ($list -is [array]) {
-        $match = $list | Where-Object { $_.Id -eq $Id }
-        return $null -ne $match  # PSUseCorrectNullComparison
-    }
-    return $false
+    if ($list -is [string]) { return $false }  # "No update found..." string => nothing outdated
+    $match = $list | Where-Object { $_.Id -eq $Id }
+    return $null -ne $match
 }
 
 function Confirm-Installation {
     param([string]$Id, [string]$ExpectedVersion, [string]$Source)
-    $installed = Get-InstalledVersion -Id $Id -Source $Source
-    if ($installed -and $ExpectedVersion -and ($installed -eq $ExpectedVersion)) { return $true }
-    if (-not (Test-StillOutdated -Id $Id -Source $Source)) { return $true }
-    return $false
+    # WAU-style confirmation: rely on whether it still appears in 'winget upgrade'
+    if (-not (Test-StillOutdated -Id $Id -Source $Source)) { return $true } else { return $false }
 }
 
 function Test-PendingReboot {
@@ -254,13 +256,13 @@ function Test-PendingReboot {
     } catch { return $false }
 }
 
-# --- WAU-style update (upgrade -> confirm -> install fallback) ---
+# --- Update logic (upgrade -> confirm -> install fallback) ---
 function Update-App {
     param([Software]$App, [string]$Source, [switch]$AllowReboot)
 
     $wg = Get-WingetPath
 
-    # UPGRADE  # [WAU-derived]
+    # UPGRADE
     $upgradeParams = @('upgrade','--id',$App.Id,'-e',
         '--accept-package-agreements','--accept-source-agreements',
         '--disable-interactivity','-h','-s',$Source)
@@ -272,7 +274,7 @@ function Update-App {
 
     $confirmed = Confirm-Installation -Id $App.Id -ExpectedVersion $App.AvailableVersion -Source $Source
 
-    # INSTALL fallback (max 2; limit to 1 if pending reboot)  # [WAU-derived]
+    # INSTALL fallback (max 2; limit to 1 if pending reboot)
     if (-not $confirmed) {
         $retryMax = 2
         if (Test-PendingReboot) { Write-Log "Pending reboot detected; limiting to 1 install attempt." -Tag "Info"; $retryMax = 1 }
@@ -288,7 +290,7 @@ function Update-App {
         }
     }
 
-    if ($confirmed) { Write-Log "$($App.Name) updated to $($App.AvailableVersion)." -Tag "Success"; return $true }
+    if ($confirmed) { Write-Log "$($App.Name) updated." -Tag "Success"; return $true }
     else { Write-Log "$($App.Name) update failed." -Tag "Error"; return $false }
 }
 
@@ -296,18 +298,29 @@ function Update-App {
 Write-Log "======== Remediation Script Started ========" -Tag "Start"
 Write-Log "ComputerName: $env:COMPUTERNAME | User: $env:USERNAME | Script: $scriptName" -Tag "Info"
 
-if (-not (Test-Winget)) { Write-Log "Winget unhealthy; attempting repair." -Tag "Info"; Invoke-WingetRepair; if (-not (Test-Winget)) { Write-Log "Winget still unhealthy after repair." -Tag "Error"; Complete-Script -ExitCode 1 } }
+if (-not (Test-Winget)) {
+    Write-Log "Winget unhealthy; attempting repair." -Tag "Info"
+    Invoke-WingetRepair
+    if (-not (Test-Winget)) { Write-Log "Winget still unhealthy after repair." -Tag "Error"; Complete-Script -ExitCode 1 }
+}
 
 $outdated = Get-WingetOutdatedApps -Source $WingetSource
-if (-not $outdated -or $outdated.Count -eq 0) { Write-Log "No upgradable packages detected on source '$WingetSource'." -Tag "Success"; Complete-Script -ExitCode 0 }
+if ($outdated -is [string]) {
+    Write-Log $outdated -Tag "Success"
+    Complete-Script -ExitCode 0
+}
 
+# Filter Unknown + blacklist
 $eligible = foreach ($app in $outdated) {
     if ($SkipUnknownInstalled -and $app.Version -eq 'Unknown') { continue }
     if (Test-IdInList -Id $app.Id -List $ExcludeIds) { continue }
     $app
 }
 
-if (-not $eligible -or $eligible.Count -eq 0) { Write-Log "All available upgrades are excluded or none eligible." -Tag "Success"; Complete-Script -ExitCode 0 }
+if (-not $eligible -or $eligible.Count -eq 0) {
+    Write-Log "All available upgrades are excluded or none eligible." -Tag "Success"
+    Complete-Script -ExitCode 0
+}
 
 $hadFailures = $false
 foreach ($app in $eligible) {
@@ -315,4 +328,3 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
-
