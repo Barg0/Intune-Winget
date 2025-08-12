@@ -33,6 +33,7 @@ $ExcludeIds = @(
     'Mozilla.Firefox*',
     'Opera.Opera*',
     'TeamViewer.TeamViewer*',
+    'Adobe.Acrobat.Reader*',
     'geeksoftwareGmbH.PDF24Creator',
     'Brave.Brave*'
 )
@@ -259,5 +260,6 @@ if ($eligible.Count -gt 0) {
     Write-Log "Updates exist but none eligible after filters (Unknown/Blacklist)." -Tag "Success"
     Complete-Script -ExitCode 0
 }
+
 
 
