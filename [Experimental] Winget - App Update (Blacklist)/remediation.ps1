@@ -34,7 +34,6 @@ $ExcludeIds = @(
     'Mozilla.Firefox*',
     'Opera.Opera*',
     'TeamViewer.TeamViewer*',
-    'Google.Chrome*',
     'geeksoftwareGmbH.PDF24Creator',
     'Brave.Brave*'
 )
@@ -271,7 +270,10 @@ function Update-App {
 
     Write-Log "Upgrading $($App.Name) [$($App.Id)] $($App.Version) -> $($App.AvailableVersion) ..." -Tag "Info"
     $out = & $wg @upgradeParams 2>&1
-    if ($LASTEXITCODE -ne 0) { Write-Log ("winget upgrade output (exit $LASTEXITCODE): " + ($out -join " ")) -Tag "Debug" }
+    if ($LASTEXITCODE -ne 0) { 
+        # Write-Log ("winget upgrade output (exit $LASTEXITCODE): " + ($out -join " ")) -Tag "Debug"
+        Write-Log ("winget upgrade output (exit $LASTEXITCODE)") -Tag "Debug"
+        }
 
     $confirmed = Confirm-Installation -Id $App.Id -ExpectedVersion $App.AvailableVersion -Source $Source
 
@@ -286,7 +288,10 @@ function Update-App {
                 '--disable-interactivity','-h','-s',$Source,'--force')
             if ($AllowReboot) { $installParams += '--allow-reboot' }
             $out2 = & $wg @installParams 2>&1
-            if ($LASTEXITCODE -ne 0) { Write-Log ("winget install output (exit $LASTEXITCODE): " + ($out2 -join " ")) -Tag "Debug" }
+            if ($LASTEXITCODE -ne 0) { 
+                # Write-Log ("winget install output (exit $LASTEXITCODE): " + ($out2 -join " ")) -Tag "Debug"
+                Write-Log ("winget install output (exit $LASTEXITCODE)") -Tag "Debug"  
+            }
             $confirmed = Confirm-Installation -Id $App.Id -ExpectedVersion $App.AvailableVersion -Source $Source
         }
     }
@@ -329,4 +334,3 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
-
