@@ -27,6 +27,7 @@ $ExcludeIds = @(
     'Microsoft.Teams*',    
     'Microsoft.Office',
     'Microsoft.OneDrive',
+    'Microsoft.AppInstaller',
     'Microsoft.RemoteDesktopClient',
     'Microsoft.VCLibs.*',
     'Fortinet.FortiClientVPN',
@@ -260,6 +261,7 @@ if ($eligible.Count -gt 0) {
     Write-Log "Updates exist but none eligible after filters (Unknown/Blacklist)." -Tag "Success"
     Complete-Script -ExitCode 0
 }
+
 
 
 
