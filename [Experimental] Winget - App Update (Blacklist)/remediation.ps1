@@ -28,6 +28,7 @@ $ExcludeIds = @(
     'Microsoft.Teams*',    
     'Microsoft.Office',
     'Microsoft.OneDrive',
+    'Microsoft.AppInstaller',
     'Microsoft.RemoteDesktopClient',
     'Microsoft.VCLibs.*',
     'Fortinet.FortiClientVPN',
@@ -335,4 +336,5 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
+
 
