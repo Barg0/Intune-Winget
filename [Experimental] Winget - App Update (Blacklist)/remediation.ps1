@@ -34,6 +34,7 @@ $ExcludeIds = @(
     'Mozilla.Firefox*',
     'Opera.Opera*',
     'TeamViewer.TeamViewer*',
+    'Adobe.Acrobat.Reader*',
     'geeksoftwareGmbH.PDF24Creator',
     'Brave.Brave*'
 )
@@ -334,3 +335,4 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
+
