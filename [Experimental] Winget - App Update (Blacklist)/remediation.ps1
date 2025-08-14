@@ -1,5 +1,3 @@
-# =========================[ Winget - App Update (Blacklist) - REMEDIATION ]=========================
-
 # ---------------------------[ UTF-8 / Encoding Normalization (WAU-style) ]---------------------------
 try {
     $null = & "$env:WINDIR\System32\cmd.exe" /c ""      # prime console like WAU
@@ -35,9 +33,9 @@ $ExcludeIds = @(
     'Mozilla.Firefox*',
     'Opera.Opera*',
     'TeamViewer.TeamViewer*',
-    'Adobe.Acrobat.Reader*',
-    'geeksoftwareGmbH.PDF24Creator',
-    'Brave.Brave*'
+    'Brave.Brave*',
+    'Microsoft.WindowsTerminal',
+    'Microsoft.PowerShell'
 )
 
 # ---------------------------[ Logging Setup (append; consistent encoding) ]---------------------------
@@ -336,5 +334,6 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
+
 
 
