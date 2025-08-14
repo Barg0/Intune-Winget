@@ -1,5 +1,3 @@
-# =========================[ Winget - App Update (Blacklist) - DETECTION ]=========================
-
 # ---------------------------[ UTF-8 / Encoding Normalization (WAU-style) ]---------------------------
 try {
     $null = & "$env:WINDIR\System32\cmd.exe" /c ""      # prime console like WAU
@@ -34,9 +32,9 @@ $ExcludeIds = @(
     'Mozilla.Firefox*',
     'Opera.Opera*',
     'TeamViewer.TeamViewer*',
-    'Adobe.Acrobat.Reader*',
-    'geeksoftwareGmbH.PDF24Creator',
-    'Brave.Brave*'
+    'Brave.Brave*',
+    'Microsoft.WindowsTerminal',
+    'Microsoft.PowerShell'
 )
 
 # ---------------------------[ Logging Setup (append; consistent encoding) ]---------------------------
@@ -261,6 +259,7 @@ if ($eligible.Count -gt 0) {
     Write-Log "Updates exist but none eligible after filters (Unknown/Blacklist)." -Tag "Success"
     Complete-Script -ExitCode 0
 }
+
 
 
 
