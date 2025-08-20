@@ -1,4 +1,4 @@
-# Script version: 2025-08-10 13:45
+# Script version: 2025-08-10 21:30
 # Script author: Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -223,23 +223,38 @@ if (-not (Test-Winget)) {
 
 # ---------------------------[ Winget app uninstall ]---------------------------
 
-# Attempt to uninstall the app
 try {
     $wingetPath = Get-WingetPath
-    # Write-Log "Running Winget uninstall command..." -Tag "Info"
-    & $wingetPath uninstall -e --id $wingetAppID --silent --scope "machine" --accept-source-agreements --force
-    if ($LASTEXITCODE -eq 0) {
-        Write-Log "Uninstallation completed successfully." -Tag "Success"
+
+    # Write-Log "Attempt: Uninstall by ID with machine scope..." -Tag "Debug"
+    & $wingetPath uninstall -e --id $wingetAppID --silent --scope machine --accept-source-agreements --force
+    $exitCode = $LASTEXITCODE
+
+    if ($exitCode -eq 0) {
+        Write-Log "Uninstallation completed successfully" -Tag "Success"
         Complete-Script -ExitCode 0
-    } else {
-        Write-Log "Winget uninstall command failed with exit code $LASTEXITCODE." -Tag "Error"
+    }
+    elseif ($exitCode -eq -1978335212) {
+        Write-Log "Uninstall failed with exit code $($exitCode). Retrying ..." -Tag "Debug"
+
+        # Retry without scope
+        & $wingetPath uninstall -e --id $wingetAppID --silent --accept-source-agreements --force
+        $exitCode = $LASTEXITCODE
+
+        if ($exitCode -eq 0) {
+            Write-Log "Uninstallation completed successfully." -Tag "Success"
+            Complete-Script -ExitCode 0
+        } else {
+            Write-Log "Uninstall failed again without scope (ExitCode: $exitCode)." -Tag "Error"
+            Complete-Script -ExitCode 1
+        }
+    }
+    else {
+        Write-Log "Uninstall failed with unexpected exit code $exitCode." -Tag "Error"
         Complete-Script -ExitCode 1
     }
-} catch {
+}
+catch {
     Write-Log "Uninstallation failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
-
 }
-
-
-
