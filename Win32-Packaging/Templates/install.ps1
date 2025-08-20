@@ -1,4 +1,4 @@
-# Script version: 2025-08-10 13:45
+# Script version: 2025-08-20 21:20
 # Script author: Barg0
 
 # ---------------------------[ Script Start Timestamp ]---------------------------
@@ -225,20 +225,36 @@ if (-not (Test-Winget)) {
 
 try {
     $wingetPath = Get-WingetPath
-    # Write-Log "Executing Winget install command..." -Tag "Info"
+
+    # First attempt: with machine scope
     & $wingetPath install -e --id $wingetAppID --silent --scope "machine" --accept-package-agreements --accept-source-agreements --force
-    if ($LASTEXITCODE -eq 0) {
+    $exitCode = $LASTEXITCODE
+
+    if ($exitCode -eq 0) {
         Write-Log "Installation completed successfully." -Tag "Success"
         Complete-Script -ExitCode 0
-    } else {
-        Write-Log "Winget install failed with exit code $LASTEXITCODE." -Tag "Error"
+    }
+    elseif ($exitCode -eq -1978335216) {
+        Write-Log "Winget install failed with exit code $exitCode (No applicable installer). Retrying without --scope..." -Tag "Info"
+
+        # Retry without machine scope
+        & $wingetPath install -e --id $wingetAppID --silent --accept-package-agreements --accept-source-agreements --force
+        $exitCode = $LASTEXITCODE
+
+        if ($exitCode -eq 0) {
+            Write-Log "Installation completed successfully without machine scope." -Tag "Success"
+            Complete-Script -ExitCode 0
+        } else {
+            Write-Log "Winget install failed again (no scope) with exit code $exitCode." -Tag "Error"
+            Complete-Script -ExitCode 1
+        }
+    }
+    else {
+        Write-Log "Winget install failed with exit code $exitCode." -Tag "Error"
         Complete-Script -ExitCode 1
     }
-} catch {
+}
+catch {
     Write-Log "Winget install failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
 }
-
-
-
-
