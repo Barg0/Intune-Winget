@@ -91,12 +91,18 @@ function Complete-Script {
 function Get-WingetPath {
     $wingetBase = "$env:ProgramW6432\WindowsApps"
     try {
-        $wingetFolders = Get-ChildItem -Path $wingetBase -Directory |
+        # Try x64 first
+        $wingetFolders = Get-ChildItem -Path $wingetBase -Directory -ErrorAction Stop |
             Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe' }
 
-        # Write-Log "Winget folder count: $($wingetFolders.Count)" -Tag "Info"
+        # If x64 not found, try arm64
         if (-not $wingetFolders) {
-            throw "No matching Winget installation folders found."
+            $wingetFolders = Get-ChildItem -Path $wingetBase -Directory -ErrorAction Stop |
+                Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_arm64__8wekyb3d8bbwe' }
+        }
+
+        if (-not $wingetFolders) {
+            throw "No matching Winget installation folders found (x64 or arm64)."
         }
 
         $latestWingetFolder = $wingetFolders |
@@ -105,13 +111,13 @@ function Get-WingetPath {
 
         $wingetPath = Join-Path $latestWingetFolder.FullName 'winget.exe'
 
-        # Write-Log "Winget exe path: $wingetPath" -Tag "Info"
         if (-not (Test-Path $wingetPath)) {
             throw "winget.exe not found at expected location."
         }
 
         return $wingetPath
-    } catch {
+    }
+    catch {
         Write-Log "Failed to detect Winget installation: $_" -Tag "Error"
         Complete-Script -ExitCode 1
     }
