@@ -61,6 +61,13 @@ LuxTrust Middleware,LuxTrust.LuxTrustMiddleware
 UltraVNC,uvncbvba.UltraVNC
 Notepad++,Notepad++.Notepad++
 Unity Hub,Unity.UnityHub
+Tabby,Eugeny.Tabby
 YubiKey Smart Card Minidriver,Yubico.YubiKeySmartCardMinidriver
 Local,Flywheel.Local
 WinSCP,WinSCP.WinSCP
+Jabra Direct,Jabra.Direct
+OpenSSL,ShiningLight.OpenSSL.Dev
+Greenshot,Greenshot.Greenshot
+Microsoft Azure Storage Explorer,Microsoft.Azure.StorageExplorer
+Remote Desktop,Microsoft.RemoteDesktopClient
+Sublime Text 4,SublimeHQ.SublimeText.4
