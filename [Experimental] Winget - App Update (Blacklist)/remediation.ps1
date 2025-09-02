@@ -35,6 +35,8 @@ $ExcludeIds = @(
     'TeamViewer.TeamViewer*',
     'Brave.Brave*',
     'Microsoft.WindowsTerminal',
+    'Adobe.Acrobat.Reader.32-bit',
+    'Adobe.Acrobat.Reader.64-bit',
     'Microsoft.PowerShell'
 )
 
@@ -354,6 +356,7 @@ foreach ($app in $eligible) {
 }
 
 if ($hadFailures) { Complete-Script -ExitCode 1 } else { Complete-Script -ExitCode 0 }
+
 
 
 
