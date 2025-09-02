@@ -98,16 +98,36 @@ function Complete-Script {
 
 # ---------------------------[ Winget health / path ]---------------------------
 function Get-WingetPath {
+    $wingetBase = "$env:ProgramW6432\WindowsApps"
     try {
-        $root = "$env:ProgramW6432\WindowsApps"
-        $folder = Get-ChildItem -Path $root -Directory |
-            Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe' } |
-            Sort-Object CreationTime -Descending | Select-Object -First 1
-        $path = Join-Path $folder.FullName 'winget.exe'
-        if (-not (Test-Path $path)) { throw "winget.exe not found." }
-        return $path
-    } catch {
-        Write-Log "Failed to locate Winget: $_" -Tag "Error"
+        # Try x64 first
+        $wingetFolders = Get-ChildItem -Path $wingetBase -Directory -ErrorAction Stop |
+            Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe' }
+
+        # If x64 not found, try arm64
+        if (-not $wingetFolders) {
+            $wingetFolders = Get-ChildItem -Path $wingetBase -Directory -ErrorAction Stop |
+                Where-Object { $_.Name -like 'Microsoft.DesktopAppInstaller_*_arm64__8wekyb3d8bbwe' }
+        }
+
+        if (-not $wingetFolders) {
+            throw "No matching Winget installation folders found (x64 or arm64)."
+        }
+
+        $latestWingetFolder = $wingetFolders |
+            Sort-Object CreationTime -Descending |
+            Select-Object -First 1
+
+        $wingetPath = Join-Path $latestWingetFolder.FullName 'winget.exe'
+
+        if (-not (Test-Path $wingetPath)) {
+            throw "winget.exe not found at expected location."
+        }
+
+        return $wingetPath
+    }
+    catch {
+        Write-Log "Failed to detect Winget installation: $_" -Tag "Error"
         Complete-Script -ExitCode 1
     }
 }
@@ -259,6 +279,7 @@ if ($eligible.Count -gt 0) {
     Write-Log "Updates exist but none eligible after filters (Unknown/Blacklist)." -Tag "Success"
     Complete-Script -ExitCode 0
 }
+
 
 
 
