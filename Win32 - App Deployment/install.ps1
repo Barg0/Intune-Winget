@@ -233,7 +233,7 @@ try {
     $wingetPath = Get-WingetPath
 
     # First attempt: with machine scope
-    & $wingetPath install -e --id $wingetAppID --silent --scope "machine" --accept-package-agreements --accept-source-agreements --force
+    & $wingetPath install -e --id $wingetAppID --silent --scope "machine" --skip-dependencies --accept-package-agreements --accept-source-agreements --force
     $exitCode = $LASTEXITCODE
 
     if ($exitCode -eq 0) {
@@ -244,7 +244,7 @@ try {
         Write-Log "Winget install failed with exit code $exitCode (No applicable installer). Retrying without --scope..." -Tag "Info"
 
         # Retry without machine scope
-        & $wingetPath install -e --id $wingetAppID --silent --accept-package-agreements --accept-source-agreements --force
+        & $wingetPath install -e --id $wingetAppID --silent --skip-dependencies --accept-package-agreements --accept-source-agreements --force
         $exitCode = $LASTEXITCODE
 
         if ($exitCode -eq 0) {
@@ -264,4 +264,5 @@ catch {
     Write-Log "Winget install failed. Exception: $_" -Tag "Error"
     Complete-Script -ExitCode 1
 }
+
 
