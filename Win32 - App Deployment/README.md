@@ -89,16 +89,25 @@ Use the output to fill out the **Publisher**, **Description**, **Homepage**, etc
 
 ---
 
-### 2️⃣ Program
+### 2️⃣ Program Settings ⚙️
 
-| Setting                   | Value                                                          |
-| ------------------------- | -------------------------------------------------------------- |
-| Install command           | `powershell.exe -ExecutionPolicy Bypass -File .\install.ps1`   |
-| Uninstall command         | `powershell.exe -ExecutionPolicy Bypass -File .\uninstall.ps1` |
-| Allow available uninstall | `Yes` or `No` based on your needs                              |
-| Install behavior          | `System`                                                       |
-| Device restart behavior   | `No specific action`                                           |
-| Return codes              | `0 = Success`, `1 = Failure`                                   |
+**Install command** 🟢
+
+```text
+%WINDIR%\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass .\install.ps1
+```
+
+**Uninstall command** 🔴
+
+```text
+%WINDIR%\sysnative\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass .\uninstall.ps1
+```
+
+* Install behavior: `System`
+* Device restart behavior: `Determine behavior based on return codes`
+  * `0` - Success
+  * `1` - Failed
+  * `3010` - Hard reboot
 
 ---
 
@@ -235,3 +244,4 @@ Uninstalls the app using Winget.
 > To enable log collection from this custom directory using the **Collect diagnostics** feature in Intune, deploy the following platform script:
 >
 > [Diagnostics - Custom Log File Directory](https://github.com/Barg0/Intune-Platform-Scripts/tree/main/Diagnostics%20-%20Custom%20Log%20File%20Directory)
+
